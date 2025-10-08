@@ -8,6 +8,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 import time
 
 chrome_options = webdriver.ChromeOptions()
+chrome_options.add_argument('--headless')
 chrome_options.add_argument('--no-sandbox')
 chrome_options.add_argument('--disable-dev-shm-usage')
 chrome_options.add_argument("--window-size=1920,1080")
@@ -22,7 +23,9 @@ browser = webdriver.Chrome(service=service,
 url='https://rollcall.com/factbase/trump/search/'
 
 browser.get(url)
-close_btn = browser.find_element(By.CSS_SELECTOR, "div.cursor-pointer.text-right.mr-4.mt-2")
+close_btn=WebDriverWait(browser, 5).until(
+        EC.element_to_be_clickable((By.CSS_SELECTOR, "div.cursor-pointer.text-right.mr-4.mt-2"))
+    )
 close_btn.click()
 
 label = WebDriverWait(browser,5).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "label[for='Speech']")))
@@ -41,5 +44,8 @@ while True:
 
 
 
+
+links=browser.find_elements(By.CSS_SELECTOR,'a[title="View Transcript"]')
+urls=[link.get_attribute("href") for link in links]
 
 
