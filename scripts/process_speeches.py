@@ -4,11 +4,13 @@ from rollcall.url_soupper import url_soupper
 from rollcall.speech_decomposer import (get_title, get_date, get_cleaned_categories, get_nbr_sentences_nbr_words_nbr_seconds, get_trump_transcriptions)
 import sqlite3
 import json
+
 def process_speeches():
     conn=sqlite3.connect("data/speeches.db")
     cur=conn.cursor()
     rows=cur.execute("Select id, url from Speeches where title is NULL").fetchall()
     for id, url in rows:
+        print(url)
         soup=url_soupper(url)
         title=get_title(soup)
         date=get_date(soup)

@@ -19,6 +19,9 @@ def get_nbr_sentences_nbr_words_nbr_seconds(soup):
         name_div=block.find(class_="font-graphik text-sm font-medium leading-normal flex items-center").get_text(strip=True)
         if "Trump" in name_div:
             trump_block=block
+    nbr_sentences=""
+    nbr_words=""
+    nbr_seconds=""
     if trump_block:
         contents=trump_block.find_all(class_="font-graphik text-xs font-medium text-[#2F3C4B]")
         contents=[content.get_text(strip=True) for content in contents]
@@ -29,10 +32,6 @@ def get_nbr_sentences_nbr_words_nbr_seconds(soup):
                 nbr_words=re.search(r'\d+',content).group()
             else :
                 nbr_seconds=re.search(r'\d+',content).group()
-    else :
-        nbr_sentences=""
-        nbr_words=""
-        nbr_seconds=""
     return [nbr_sentences,nbr_words,nbr_seconds]
 
 def get_cleaned_categories(soup):
@@ -47,7 +46,8 @@ def get_trump_transcriptions(soup):
     list_transcriptions=[]
     for transcription in transcriptions :
         speaker=transcription.find(class_="text-md inline").get_text(strip=True)
-        timestamp=transcription.find(class_='text-xs text-gray-600 inline ml-2').get_text(strip=True)
+        try : timestamp=transcription.find(class_='text-xs text-gray-600 inline ml-2').get_text(strip=True)
+        except : timestamp=""
         text=transcription.find(class_='flex-auto text-md text-gray-600 leading-loose').get_text(strip=True)
         list_transcriptions.append([speaker,timestamp,text])
     trump_transcriptions=[transcription_list[1:] for transcription_list in list_transcriptions if "Donald Trump" in transcription_list[0]]
