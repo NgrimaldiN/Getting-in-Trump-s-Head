@@ -14,19 +14,25 @@ def get_date(soup):
 def get_nbr_sentences_nbr_words_nbr_seconds(soup):
     blocks_container=soup.find(class_="flex flex-wrap gap-8 justify-between")
     blocks=blocks_container.find_all(class_='flex-1 h-content')
+    trump_block=None
     for block in blocks:
         name_div=block.find(class_="font-graphik text-sm font-medium leading-normal flex items-center").get_text(strip=True)
         if "Trump" in name_div:
             trump_block=block
-    contents=trump_block.find_all(class_="font-graphik text-xs font-medium text-[#2F3C4B]")
-    contents=[content.get_text(strip=True) for content in contents]
-    for content in contents :
-        if "sentences" in content:
-            nbr_sentences=re.search(r'\d+',content).group()
-        elif "words" in content:
-            nbr_words=re.search(r'\d+',content).group()
-        else :
-            nbr_seconds=re.search(r'\d+',content).group()
+    if trump_block:
+        contents=trump_block.find_all(class_="font-graphik text-xs font-medium text-[#2F3C4B]")
+        contents=[content.get_text(strip=True) for content in contents]
+        for content in contents :
+            if "sentences" in content:
+                nbr_sentences=re.search(r'\d+',content).group()
+            elif "words" in content:
+                nbr_words=re.search(r'\d+',content).group()
+            else :
+                nbr_seconds=re.search(r'\d+',content).group()
+    else :
+        nbr_sentences=""
+        nbr_words=""
+        nbr_seconds=""
     return [nbr_sentences,nbr_words,nbr_seconds]
 
 def get_cleaned_categories(soup):
