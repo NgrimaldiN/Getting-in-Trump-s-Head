@@ -46,7 +46,7 @@ def get_trump_transcriptions(soup):
     list_transcriptions=[]
     for transcription in transcriptions :
         speaker=transcription.find(class_="text-md inline").get_text(strip=True)
-        try : timestamp=transcription.find(class_='text-xs text-gray-600 inline ml-2').get_text(strip=True)
+        try : timestamp=transcription.find(class_='text-xs text-gray-600 inline ml-2').get_text(strip=True) #certains speech n'ont pas de timestamp
         except : timestamp=""
         text=transcription.find(class_='flex-auto text-md text-gray-600 leading-loose').get_text(strip=True)
         list_transcriptions.append([speaker,timestamp,text])
