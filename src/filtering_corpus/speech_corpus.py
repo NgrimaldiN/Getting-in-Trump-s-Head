@@ -186,6 +186,59 @@ class SpeechCorpus:
         
         return new_corpus
 
+    def get_full_speeches(self):
+        """
+        Aggregate transcriptions to get the full text for each speech.
+        
+        Returns:
+            pd.DataFrame: A DataFrame with speech metadata and full text.
+        """
+        # Group transcriptions by speech_id and join text
+        aggregations = {'text': lambda x: ' '.join(x)}
+            
+        if 'cleaned_transcription' in self.transcriptions.columns:
+            aggregations['cleaned_transcription'] = lambda x: ' '.join(x.astype(str))
+            
+        full_text = self.transcriptions.groupby('speech_id').agg(aggregations).reset_index()
+        
+        # Merge with speeches metadata
+        full_speeches = self.speeches.merge(full_text, left_on='id', right_on='speech_id', how='inner')
+        
+        return full_speeches
+
+    def filter_date(self, start_date=None, end_date=None):
+        """
+        Filter speeches by a date range.
+        
+        Args:
+            start_date (str or datetime, optional): The start date (inclusive).
+            end_date (str or datetime, optional): The end date (inclusive).
+            
+        Returns:
+            SpeechCorpus: A new SpeechCorpus instance with the filtered data.
+        """
+        filtered_speeches = self.speeches.copy()
+        
+        if start_date:
+            filtered_speeches = filtered_speeches[filtered_speeches['date'] >= pd.to_datetime(start_date)]
+            
+        if end_date:
+            filtered_speeches = filtered_speeches[filtered_speeches['date'] <= pd.to_datetime(end_date)]
+            
+        return self._create_filtered_corpus(filtered_speeches)
+
+    def remove_speeches_before(self, year):
+        """
+        Remove speeches before a specific year.
+        
+        Args:
+            year (int): The year cutoff. Speeches from this year onwards are kept.
+            
+        Returns:
+            SpeechCorpus: A new SpeechCorpus instance with the filtered data.
+        """
+        return self.filter_date(start_date=f"{year}-01-01")
+
     def save_sub_db(self, output_dir_name):
         """
         Save the filtered corpus to a new directory.
