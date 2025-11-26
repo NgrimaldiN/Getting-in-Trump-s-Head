@@ -40,6 +40,11 @@ The database is initialized automatically, but you can manually initialize it us
 python scripts/init_db.py
 ```
 
+```bash
+tad data/speeches.parquet
+tad data/transcriptions.parquet
+```
+
 ## Notebooks
 
 The `notebooks` directory contains Jupyter notebooks for analysis and testing:
