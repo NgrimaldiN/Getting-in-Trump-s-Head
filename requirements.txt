@@ -12,3 +12,5 @@ jupyter
 notebook
 pyarrow
 tad
+spacy
+simplemma
