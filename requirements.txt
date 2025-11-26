@@ -1,0 +1,12 @@
+chromedriver-autoinstaller
+selenium
+requests
+beautifulsoup4
+pandas
+seaborn
+matplotlib
+geopandas
+geopy
+plotly
+jupyter
+notebook
