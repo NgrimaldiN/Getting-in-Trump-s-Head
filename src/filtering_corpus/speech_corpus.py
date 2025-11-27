@@ -4,7 +4,7 @@ import re
 import datetime
 
 class SpeechCorpus:
-    def __init__(self, data_dir="data", transcription_file="transcriptions.parquet"):
+    def __init__(self, data_dir="data", transcription_file="transcriptions_cleaned.parquet"):
         """
         Initialize the SpeechCorpus.
         
@@ -186,18 +186,28 @@ class SpeechCorpus:
         
         return new_corpus
 
-    def get_full_speeches(self):
+    def get_full_speeches(self, text_columns=None):
         """
         Aggregate transcriptions to get the full text for each speech.
+        
+        Args:
+            text_columns (list or str, optional): Column(s) to aggregate. 
+                                                  If None, defaults to ['text', 'cleaned_transcription'] (if present).
         
         Returns:
             pd.DataFrame: A DataFrame with speech metadata and full text.
         """
-        # Group transcriptions by speech_id and join text
-        aggregations = {'text': lambda x: ' '.join(x)}
+        if text_columns is None:
+            text_columns = []
+            if 'text' in self.transcriptions.columns:
+                text_columns.append('text')
+            if 'cleaned_transcription' in self.transcriptions.columns:
+                text_columns.append('cleaned_transcription')
+        elif isinstance(text_columns, str):
+            text_columns = [text_columns]
             
-        if 'cleaned_transcription' in self.transcriptions.columns:
-            aggregations['cleaned_transcription'] = lambda x: ' '.join(x.astype(str))
+        # Group transcriptions by speech_id and join text
+        aggregations = {col: lambda x: ' '.join(x.astype(str)) for col in text_columns if col in self.transcriptions.columns}
             
         full_text = self.transcriptions.groupby('speech_id').agg(aggregations).reset_index()
         
