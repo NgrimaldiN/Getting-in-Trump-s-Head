@@ -15,10 +15,28 @@ from src.text_cleaning.cleaner import clean_docs
 # Configure logging
 logging.basicConfig(level=logging.INFO, format='%(asctime)s - %(levelname)s - %(message)s')
 
+import argparse
+
 def main():
+    parser = argparse.ArgumentParser(description='Clean transcriptions for a candidate.')
+    parser.add_argument('--candidate', type=str, default='trump', choices=['trump', 'harris', 'biden'], help='Candidate to process (trump, harris, or biden)')
+    args = parser.parse_args()
+
+    candidate = args.candidate.lower()
+    
     data_dir = project_root / 'data'
-    input_file = data_dir / 'transcriptions.parquet'
-    output_file = data_dir / 'transcriptions_cleaned.parquet'
+    
+    if candidate == 'trump':
+        input_file = data_dir / 'transcriptions.parquet'
+        output_file = data_dir / 'transcriptions_cleaned.parquet'
+    elif candidate in ['harris', 'biden']:
+        input_file = data_dir / 'other_transcriptions.parquet'
+        output_file = data_dir / 'other_transcriptions_cleaned.parquet'
+    else:
+        print(f"Unknown candidate: {candidate}")
+        return
+
+    print(f"Cleaning transcriptions for {candidate} from {input_file} to {output_file}")
 
     if not input_file.exists():
         logging.error(f"Input file not found: {input_file}")
