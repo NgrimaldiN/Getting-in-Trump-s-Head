@@ -4,7 +4,7 @@ import re
 import datetime
 
 class SpeechCorpus:
-    def __init__(self, data_dir="data", transcription_file="transcriptions_cleaned.parquet"):
+    def __init__(self, data_dir="data", transcription_file="transcriptions.parquet"):
         """
         Initialize the SpeechCorpus.
         

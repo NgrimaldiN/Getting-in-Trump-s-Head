@@ -28,6 +28,24 @@ def convert_sqlite_to_parquet(db_path="data/speeches.db", output_dir="data"):
     if 'speech_id' in df_transcriptions.columns:
          df_transcriptions['speech_id'] = pd.to_numeric(df_transcriptions['speech_id'], errors='coerce')
          
-    df_transcriptions.to_parquet(output_path / "transcriptions.parquet", index=False)
+    transcriptions_file = output_path / "transcriptions.parquet"
+    if transcriptions_file.exists():
+        existing_df = pd.read_parquet(transcriptions_file)
+        # Identify extra columns in existing file (e.g. cleaned text columns)
+        extra_cols = [col for col in existing_df.columns if col not in df_transcriptions.columns]
+        if extra_cols:
+            print(f"Preserving existing columns: {extra_cols}")
+            # Merge extra columns based on 'id'
+            # We use left join to keep all new rows, and fill missing with NaN
+            if 'id' in df_transcriptions.columns and 'id' in existing_df.columns:
+                df_transcriptions = df_transcriptions.merge(
+                    existing_df[['id'] + extra_cols],
+                    on='id',
+                    how='left'
+                )
+            else:
+                print("Warning: 'id' column missing. Cannot preserve extra columns.")
+
+    df_transcriptions.to_parquet(transcriptions_file, index=False)
     
     conn.close()

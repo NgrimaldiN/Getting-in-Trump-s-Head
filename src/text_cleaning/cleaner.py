@@ -1,5 +1,7 @@
 import spacy
 import simplemma
+import pandas as pd
+from pathlib import Path
 from typing import List, Optional
 
 # Load spacy model globally to avoid reloading it multiple times
@@ -100,3 +102,51 @@ def clean_docs(
         cleaned_texts.append(" ".join(tokens))
         
     return cleaned_texts
+
+def apply_cleaning_to_parquet(
+    parquet_path: str,
+    output_column: str,
+    remove_stopwords: bool = True,
+    remove_punctuation: bool = True,
+    lemmatize: bool = True,
+    overwrite: bool = False
+):
+    """
+    Applies text cleaning to the 'text' column of a parquet file and saves the result
+    to a new column in the same file.
+    
+    Args:
+        parquet_path (str): Path to the parquet file.
+        output_column (str): Name of the new column to store cleaned text.
+        remove_stopwords (bool): Whether to remove stopwords.
+        remove_punctuation (bool): Whether to remove punctuation.
+        lemmatize (bool): Whether to lemmatize words.
+        overwrite (bool): Whether to overwrite the column if it already exists.
+    """
+    path = Path(parquet_path)
+    if not path.exists():
+        raise FileNotFoundError(f"File not found: {path}")
+        
+    df = pd.read_parquet(path)
+    
+    if 'text' not in df.columns:
+        raise ValueError("Parquet file must contain a 'text' column")
+        
+    if output_column in df.columns and not overwrite:
+        print(f"Column '{output_column}' already exists. Skipping. Set overwrite=True to force update.")
+        return
+        
+    print(f"Cleaning text for column '{output_column}'...")
+    # Use clean_docs for batch processing
+    cleaned_texts = clean_docs(
+        df['text'].fillna("").tolist(),
+        remove_stopwords=remove_stopwords,
+        remove_punctuation=remove_punctuation,
+        lemmatize=lemmatize
+    )
+    
+    df[output_column] = cleaned_texts
+    
+    df.to_parquet(path, index=False)
+    print(f"Saved updated parquet to {path}")
+
