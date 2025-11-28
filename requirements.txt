@@ -14,3 +14,5 @@ pyarrow
 tad
 spacy
 simplemma
+torch
+numpy
