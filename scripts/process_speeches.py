@@ -53,11 +53,23 @@ def process_speeches():
         candidate_transcript=get_candidate_transcriptions(soup, candidate_full_name)
 
         cur.execute(""" Update Speeches Set title=?, date=?, nbr_sentences=?, nbr_words=?, nbr_seconds=?,categories=?, person_name=? where id=?""", (title, date, nbr_sentences, nbr_words, nbr_seconds, categories_str, person_name, id))
+        
+        transcription_data_list = []
         for transcription in candidate_transcript:
             cur.execute("""
             INSERT INTO Transcriptions (speech_id, timestamp, text)
             VALUES (?, ?, ?);
         """, (id, transcription[0], transcription[1]))
+            transcription_id = cur.lastrowid
+            
+            transcription_data_list.append({
+                "id": transcription_id,
+                "speech_id": id,
+                "timestamp": transcription[0],
+                "text": transcription[1],
+                "duration": None, # Not captured in get_trump_transcriptions currently
+                "person_name": person_name
+            })
         conn.commit()
         
         # Add to Parquet
@@ -72,15 +84,6 @@ def process_speeches():
             "categories": categories_str,
             "person_name": person_name
         }
-        
-        transcription_data_list = []
-        for transcription in candidate_transcript:
-            transcription_data_list.append({
-                "speech_id": id,
-                "timestamp": transcription[0],
-                "text": transcription[1],
-                "duration": None # Not captured in get_trump_transcriptions currently
-            })
             
         add_speech_to_parquet(speech_data, transcription_data_list, file_prefix=parquet_prefix)
         
