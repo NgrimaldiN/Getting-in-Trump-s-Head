@@ -1,3 +1,4 @@
+import re
 import spacy
 import simplemma
 import pandas as pd
@@ -17,14 +18,19 @@ def clean_text(
     text: str,
     remove_stopwords: bool = True,
     remove_punctuation: bool = True,
-    lemmatize: bool = True
+    lemmatize: bool = True,
+    remove_brackets: bool = False
 ) -> str:
     """
     Cleans a single text string by tokenizing, optionally removing stopwords/punctuation,
-    and lemmatizing with simplemma.
+    removing text in brackets, and lemmatizing with simplemma.
     """
     if not text:
         return ""
+
+    # Remove text between brackets if requested
+    if remove_brackets:
+        text = re.sub(r'\[.*?\]', '', text)
 
     # Tokenize with spacy (disable unnecessary components for speed)
     doc = nlp(text, disable=['parser', 'ner', 'textcat'])
@@ -62,23 +68,20 @@ def clean_docs(
     remove_stopwords: bool = True,
     remove_punctuation: bool = True,
     lemmatize: bool = True,
+    remove_brackets: bool = False,
     n_process: int = 1,
     batch_size: int = 100
 ) -> List[str]:
     """
     Cleans a list of documents.
     """
-    # For simplemma, we might just iterate. Spacy pipe is good for tokenization.
-    # But since we want to use simplemma for lemmatization, we can mix them.
-    # However, simplemma works on words. Spacy gives us tokens.
-    
     cleaned_texts = []
-    # We can use nlp.pipe for faster tokenization if we have many docs
-    # But we need to handle the custom logic inside.
     
-    # If n_process > 1, we should be careful with simplemma inside the loop if it's not picklable or efficient.
-    # For simplicity and safety with simplemma, let's stick to a simple loop or use spacy's pipe for tokenization only.
-    
+    # Pre-process texts to remove brackets if requested
+    # We do this before spacy pipe because it changes the text content
+    if remove_brackets:
+        texts = [re.sub(r'\[.*?\]', '', t) if t else "" for t in texts]
+
     # Let's use nlp.pipe to get docs, then process them.
     docs = nlp.pipe(texts, n_process=n_process, batch_size=batch_size, disable=['parser', 'ner', 'textcat'])
     
@@ -109,6 +112,7 @@ def apply_cleaning_to_parquet(
     remove_stopwords: bool = True,
     remove_punctuation: bool = True,
     lemmatize: bool = True,
+    remove_brackets: bool = False,
     overwrite: bool = False
 ):
     """
@@ -121,6 +125,7 @@ def apply_cleaning_to_parquet(
         remove_stopwords (bool): Whether to remove stopwords.
         remove_punctuation (bool): Whether to remove punctuation.
         lemmatize (bool): Whether to lemmatize words.
+        remove_brackets (bool): Whether to remove text between brackets.
         overwrite (bool): Whether to overwrite the column if it already exists.
     """
     path = Path(parquet_path)
@@ -142,7 +147,8 @@ def apply_cleaning_to_parquet(
         df['text'].fillna("").tolist(),
         remove_stopwords=remove_stopwords,
         remove_punctuation=remove_punctuation,
-        lemmatize=lemmatize
+        lemmatize=lemmatize,
+        remove_brackets=remove_brackets
     )
     
     df[output_column] = cleaned_texts
