@@ -15,3 +15,5 @@ def open_page_close_popup_and_click_filters(browser, url):
     label = WebDriverWait(browser,5).until(EC.element_to_be_clickable((By.CSS_SELECTOR, "label[for='Speech']")))
     label.click()
     time.sleep(2)
+
+from selenium.common.exceptions import TimeoutException
