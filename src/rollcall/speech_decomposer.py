@@ -11,13 +11,13 @@ def get_date(soup):
     speech_date=re.search(r"-\s(.+)",speech_titles).group(1).strip()
     return speech_date
 
-def get_nbr_sentences_nbr_words_nbr_seconds(soup):
+def get_nbr_sentences_nbr_words_nbr_seconds(soup, candidate_last_name="Trump"):
     blocks_container=soup.find(class_="flex flex-wrap gap-8 justify-between")
     blocks=blocks_container.find_all(class_='flex-1 h-content')
     trump_block=None
     for block in blocks:
         name_div=block.find(class_="font-graphik text-sm font-medium leading-normal flex items-center").get_text(strip=True)
-        if "Trump" in name_div:
+        if candidate_last_name in name_div:
             trump_block=block
     nbr_sentences=""
     nbr_words=""
@@ -41,16 +41,16 @@ def get_cleaned_categories(soup):
     categories=list(set([category[i].strip() for category in categories for i in range(len(category))]))
     return categories
 
-def get_trump_transcriptions(soup):
+def get_candidate_transcriptions(soup, candidate_full_name="Donald Trump"):
     transcriptions=soup.find_all(class_='flex gap-4 py-2')
     list_transcriptions=[]
     for transcription in transcriptions :
         speaker=transcription.find(class_="text-md inline").get_text(strip=True)
-        try : timestamp=transcription.find(class_='text-xs text-gray-600 inline ml-2').get_text(strip=True)
+        try : timestamp=transcription.find(class_='text-xs text-gray-600 inline ml-2').get_text(strip=True) #certains speech n'ont pas de timestamp
         except : timestamp=""
         text=transcription.find(class_='flex-auto text-md text-gray-600 leading-loose').get_text(strip=True)
         list_transcriptions.append([speaker,timestamp,text])
-    trump_transcriptions=[transcription_list[1:] for transcription_list in list_transcriptions if "Donald Trump" in transcription_list[0]]
+    trump_transcriptions=[transcription_list[1:] for transcription_list in list_transcriptions if candidate_full_name in transcription_list[0]]
     return trump_transcriptions
 
 

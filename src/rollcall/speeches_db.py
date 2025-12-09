@@ -2,8 +2,8 @@ import sqlite3
 import pandas as pd
 from pathlib import Path
 
-def init_db():
-    conn = sqlite3.connect("data/speeches.db")
+def init_db(db_path="data/speeches.db"):
+    conn = sqlite3.connect(db_path)
     # Table Speeches
     conn.execute("""
         CREATE TABLE IF NOT EXISTS Speeches (
@@ -14,7 +14,8 @@ def init_db():
             nbr_sentences INTEGER,
             nbr_words INTEGER,
             nbr_seconds INTEGER,
-            categories TEXT
+            categories TEXT,
+            person_name TEXT
         );
     """)
 
@@ -32,7 +33,7 @@ def init_db():
     conn.commit()
     return conn
 
-def add_speech_to_parquet(speech_data, transcription_data, output_dir="data"):
+def add_speech_to_parquet(speech_data, transcription_data, output_dir="data", file_prefix=""):
     """
     Appends a new speech and its transcription to the existing Parquet files.
     If files don't exist, creates them.
@@ -43,8 +44,11 @@ def add_speech_to_parquet(speech_data, transcription_data, output_dir="data"):
         output_dir (str): Directory where parquet files are stored
     """
     output_path = Path(output_dir)
-    speeches_file = output_path / "speeches.parquet"
-    transcriptions_file = output_path / "transcriptions.parquet"
+    speeches_filename = f"{file_prefix}speeches.parquet" if file_prefix else "speeches.parquet"
+    transcriptions_filename = f"{file_prefix}transcriptions.parquet" if file_prefix else "transcriptions.parquet"
+    
+    speeches_file = output_path / speeches_filename
+    transcriptions_file = output_path / transcriptions_filename
     
     # Process Speech
     new_speech_df = pd.DataFrame([speech_data])
