@@ -14,5 +14,10 @@ pyarrow
 tad
 spacy
 simplemma
+# NLP & Deep Learning
 torch
 numpy
+transformers
+datasets
+accelerate
+scikit-learn
