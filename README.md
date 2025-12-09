@@ -43,6 +43,10 @@ python scripts/init_db.py
 ```bash
 tad data/speeches.parquet
 tad data/transcriptions.parquet
+
+tad data/other_speeches.parquet
+tad data/other_transcriptions.parquet
+
 ```
 
 ## Notebooks

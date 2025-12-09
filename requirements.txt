@@ -16,3 +16,4 @@ spacy
 simplemma
 torch
 numpy
+textstat

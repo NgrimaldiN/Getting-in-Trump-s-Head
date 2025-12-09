@@ -205,9 +205,14 @@ class SpeechCorpus:
                 text_columns.append('cleaned_transcription')
         elif isinstance(text_columns, str):
             text_columns = [text_columns]
+
+        # Verify all requested columns exist
+        missing_cols = [col for col in text_columns if col not in self.transcriptions.columns]
+        if missing_cols:
+            raise ValueError(f"The following columns are missing from transcriptions: {missing_cols}. Available: {self.transcriptions.columns.tolist()}")
             
         # Group transcriptions by speech_id and join text
-        aggregations = {col: lambda x: ' '.join(x.astype(str)) for col in text_columns if col in self.transcriptions.columns}
+        aggregations = {col: lambda x: ' '.join(x.astype(str)) for col in text_columns}
             
         full_text = self.transcriptions.groupby('speech_id').agg(aggregations).reset_index()
         
