@@ -67,7 +67,7 @@ def process_speeches():
                 "speech_id": id,
                 "timestamp": transcription[0],
                 "text": transcription[1],
-                "duration": None, # Not captured in get_trump_transcriptions currently
+                "duration": None, 
                 "person_name": person_name
             })
         conn.commit()
