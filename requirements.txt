@@ -17,6 +17,7 @@ simplemma
 # NLP & Deep Learning
 torch
 numpy
+textstat
 transformers
 datasets
 accelerate
