@@ -22,3 +22,4 @@ transformers
 datasets
 accelerate
 scikit-learn
+wordcloud
