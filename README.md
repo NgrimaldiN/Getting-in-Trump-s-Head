@@ -60,6 +60,10 @@ To run the notebooks:
 jupyter notebook
 ```
 
+```bash
+streamlit run app.py
+```
+
 ## Project Structure
 
 - `src/rollcall`: Main package containing modules for scraping, parsing, and database operations.
