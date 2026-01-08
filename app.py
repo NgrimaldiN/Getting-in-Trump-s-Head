@@ -6,6 +6,8 @@ import src.app.visualizations as viz
 import src.app.analysis as nlp
 import src.app.map_viz as map_viz
 import src.app.word_tracker as word_tracker
+import src.app.about as about
+
 
 # --- Configuration ---
 st.set_page_config(layout="wide", page_title="Trump Speech Analyzer")
@@ -26,7 +28,13 @@ if df_filtered.empty:
 # --- Main Dashboard ---
 st.title("Donald Trump Speech Analysis")
 
-tab1, tab2, tab5, tab3, tab4 = st.tabs(["Overview & Evolution", "N-Gram & Analysis", "Word Tracker", "Speech Inspector", "Map"])
+tab_about, tab1, tab2, tab5, tab3, tab4 = st.tabs(["À propos", "Overview & Evolution", "N-Gram & Analysis", "Word Tracker", "Speech Inspector", "Map"])
+
+# --- Tab: À propos ---
+with tab_about:
+    about.render_about()
+
+
 
 # --- Tab 1: Overview & Evolution ---
 with tab1:

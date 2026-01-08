@@ -14,6 +14,7 @@ pyarrow
 tad
 spacy
 simplemma
+wordcloud
 # NLP & Deep Learning
 torch
 numpy
@@ -22,4 +23,3 @@ transformers
 datasets
 accelerate
 scikit-learn
-wordcloud
